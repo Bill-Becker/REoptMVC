@@ -1,0 +1,20 @@
+{
+    "Site": {
+        "longitude": -118.1164613,
+        "latitude": 34.5794343,
+        "node": 3
+    },
+    "PV": {
+        "installed_cost_per_kw": 2000.0
+    },
+    "ElectricLoad": {
+        "doe_reference_name": "LargeOffice",
+        "annual_kwh": 10000000.0
+    },
+    "ElectricStorage": {
+        "can_grid_charge": true
+    },
+    "ElectricTariff": {
+        "urdb_label": "5ed6c1a15457a3367add15ae"
+    }
+}
