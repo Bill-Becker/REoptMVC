@@ -1,0 +1,18 @@
+<% partial("app/resources/runs/views/_form.jl.html") %>
+<% partial("app/resources/runs/views/_messages.jl.html") %>
+
+<% if isempty(runs) %>
+    <p>No runs in the db yet!</p>
+<% else %>
+    <ul class="list-group">
+        <h3>Last three REopt runs in the database</h3>
+        <% for_each(runs[end-2:end]) do run %>
+        <li class="list-group-item form-check form-switch">
+            <label>Run ID = $(run.id);</label>
+            <label>Run UUID = $(run.run_uuid);</label>
+            <label>Run Status = $(run.status);</label>
+            <label>Run Input = $(run.input)</label>
+        </li>
+        <% end %>
+    </ul>
+<% end %>
