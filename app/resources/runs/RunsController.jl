@@ -56,7 +56,14 @@ function list()
   RunsController.runs() |> json
 end
 
+# Find and return one Run
 function item()
+    run = findone(Run, run_uuid = params(:run_uuid))
+    if run === nothing
+        return JSONException(status = NOT_FOUND, message = "Run not found") |> json
+    end
+
+    run |> json
 end
 
 function check_payload(payload = Requests.jsonpayload())
@@ -101,9 +108,35 @@ function create()
 end
 
 function update()
+    # Not sure what is relevant to update because we need to run REopt again if inputs are updated
+    payload = try
+        check_payload()
+    catch ex
+        return json(ex)
+    end
+
+    run = findone(Run, run_uuid = params(:run_uuid))
+    if run === nothing
+        return JSONException(status = NOT_FOUND, message = "Run not found") |> json
+    end
+
+    run.inputs = get(payload, "inputs", run.inputs)
+    # TODO if inputs are changes, need to re-run REopt and store outputs too
+
+    persist(run)
 end
 
 function delete()
+    run = findone(Run, run_uuid = params(:run_uuid))
+    if run === nothing
+        return JSONException(status = NOT_FOUND, message = "Run not found") |> json
+    end
+
+    try
+        SearchLight.delete(run) |> json
+    catch ex
+        JSONException(status = INTERNAL_ERROR, message = string(ex)) |> json
+    end
 end
 
 end # V1
