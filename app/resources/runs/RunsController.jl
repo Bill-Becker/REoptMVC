@@ -40,6 +40,14 @@ function create()
     end
 end
 
+# Placeholder function for run_reopt(), to be called with @async
+function run_reopt(run::Run)
+    sleep(20)
+    run.status = "optimal"
+    # TODO Create outputs/results field of Run struct and populate with dummy outputs
+    save!(run)
+end
+
 ### API
 module API
 module V1
@@ -81,15 +89,18 @@ function persist(run)
     end
 
     try
+        # What is "(SearchLight).ispersisted" and why is it false for a typical good POST? No docstrings.
         if ispersisted(run)
             save!(run)
-            json(run, status = OK)
+            json(run.run_uuid, status = OK)
         else
+            run.status = "optimizing..."
             save!(run)
+            @async RunsController.run_reopt(run)
             json(
-                run,
+                Dict("run_uuid" => run.run_uuid),
                 status = CREATED,
-                headers = Dict("Location" => "/api/v1/runs/$(run.id)"),
+                headers = Dict("Location" => "/api/v1/runs/$(run.run_uuid)"),
             )
         end
     catch ex
