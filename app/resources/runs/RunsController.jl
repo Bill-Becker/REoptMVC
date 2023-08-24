@@ -71,7 +71,7 @@ function item()
         return JSONException(status = NOT_FOUND, message = "Run not found") |> json
     end
 
-    run |> json
+    run_dict(run) |> json
 end
 
 function check_payload(payload = Requests.jsonpayload())
@@ -81,7 +81,7 @@ function check_payload(payload = Requests.jsonpayload())
     payload
 end
 
-function persist(run)
+function persist(run::Run)
     validator = validate(run)
     if haserrors(validator)
         return JSONException(status = BAD_REQUEST, message = errors_to_string(validator)) |>
@@ -92,13 +92,15 @@ function persist(run)
         # What is "(SearchLight).ispersisted" and why is it false for a typical good POST? No docstrings.
         if ispersisted(run)
             save!(run)
-            json(run.run_uuid, status = OK)
+            json(run_dict(run), status = OK)
         else
             run.status = "optimizing..."
             save!(run)
             @async RunsController.run_reopt(run)
+            println("Trying to call run_dict(run)")
+            print("run_dict = ", run_dict(run))
             json(
-                Dict("run_uuid" => run.run_uuid),
+                run_dict(run),
                 status = CREATED,
                 headers = Dict("Location" => "/api/v1/runs/$(run.run_uuid)"),
             )
@@ -131,7 +133,7 @@ function update()
         return JSONException(status = NOT_FOUND, message = "Run not found") |> json
     end
 
-    run.inputs = get(payload, "inputs", run.inputs)
+    run.input = get(payload, "input", run.input)
     # TODO if inputs are changes, need to re-run REopt and store outputs too
 
     persist(run)
