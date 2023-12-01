@@ -5,6 +5,6 @@ const PACKAGES = [
     "JSON",
     "Logging",
     "SearchLight",
-    "SearchLightSQLite"
+    "SearchLightSQLite",
     "UUIDs"
 ]
