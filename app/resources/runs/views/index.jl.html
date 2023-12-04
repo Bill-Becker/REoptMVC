@@ -6,7 +6,7 @@
 <% else %>
     <ul class="list-group">
         <h3>Last three REopt runs in the database</h3>
-        <% for_each(runs[end-2:end]) do run %>
+        <% for_each(runs[max(end-2,1):end]) do run %>
         <li class="list-group-item form-check form-switch">
             <label>Run ID = $(run.id);</label>
             <label>Run UUID = $(run.run_uuid);</label>
